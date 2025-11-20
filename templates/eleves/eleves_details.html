@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Détails Élève{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h2>Détails de l'élève</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('eleves.list_eleves') }}" class="btn btn-secondary">← Retour</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5 class="card-title">Informations Personnelles</h5>
+                    <p><strong>ID:</strong> {{ student.id }}</p>
+                    <p><strong>Nom:</strong> {{ student.last_name }}</p>
+                    <p><strong>Prénom:</strong> {{ student.first_name }}</p>
+                    <p><strong>Nom Complet:</strong> {{ student.full_name }}</p>
+                    <p><strong>Date de naissance:</strong> 
+                        {% if student.birthdate %}
+                            {{ student.birthdate.strftime('%d/%m/%Y') }}
+                        {% else %}
+                            <em>Non renseignée</em>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="card-title">Classe</h5>
+                    <p><strong>Classe:</strong> 
+                        {% if student.classe %}
+                            {{ student.classe.name }}
+                        {% else %}
+                            <em>Aucune classe assignée</em>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="card-title">Parents/Tuteurs</h5>
+            {% if student.parents %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Prénom</th>
+                                <th>Nom</th>
+                                <th>Téléphone</th>
+                                <th>WhatsApp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for parent in student.parents %}
+                            <tr>
+                                <td>{{ parent.first_name or '-' }}</td>
+                                <td>{{ parent.last_name or '-' }}</td>
+                                <td>{{ parent.phone_e164 or '-' }}</td>
+                                <td>
+                                    {% if parent.whatsapp_optin %}
+                                        <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p><em>Aucun parent enregistré</em></p>
+            {% endif %}
+
+            <hr>
+
+            <div class="mt-3">
+                <a href="{{ url_for('eleves.edit_eleve', id=student.id) }}" class="btn btn-warning">✏️ Modifier</a>
+                <form action="{{ url_for('eleves.delete_eleve', id=student.id) }}" method="POST" style="display:inline;">
+                    {{ delete_form.hidden_tag() }}
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">🗑️ Supprimer</button>
+                </form>
+                <a href="{{ url_for('eleves.list_eleves') }}" class="btn btn-secondary">← Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

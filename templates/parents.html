@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Parents{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h2>Gestion des Parents/Tuteurs</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('parents.add_parent') }}" class="btn btn-success">
+                ➕ Ajouter un parent
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'info' if category == 'info' else 'warning' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Prénom</th>
+                    <th>Nom</th>
+                    <th>Téléphone</th>
+                    <th>WhatsApp</th>
+                    <th>Élèves Liés</th>
+                    <th width="250">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if parents %}
+                    {% for parent in parents %}
+                    <tr>
+                        <td>{{ parent.id }}</td>
+                        <td>{{ parent.first_name or '-' }}</td>
+                        <td>{{ parent.last_name or '-' }}</td>
+                        <td>{{ parent.phone_e164 or '-' }}</td>
+                        <td>
+                            {% if parent.whatsapp_optin %}
+                                <span class="badge bg-success">✓ Oui</span>
+                            {% else %}
+                                <span class="badge bg-secondary">✗ Non</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if parent.students %}
+                                <div class="badge bg-info">
+                                    {{ parent.students|length }} élève(s)
+                                </div>
+                                <br>
+                                <small>
+                                    {% for student in parent.students %}
+                                        <span class="badge bg-light text-dark">{{ student.full_name }}</span>
+                                    {% endfor %}
+                                </small>
+                            {% else %}
+                                <em class="text-muted">Aucun élève</em>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <!-- Modifier -->
+                            <a href="{{ url_for('parents.edit_parent', id=parent.id) }}"
+                               class="btn btn-sm btn-link text-warning" title="Modifier"
+                               data-bs-toggle="tooltip" data-bs-title="Modifier">
+                                ✏️
+                            </a>
+
+                            <!-- Supprimer -->
+                            <form action="{{ url_for('parents.delete_parent', id=parent.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-link text-danger" title="Supprimer"
+                                        data-bs-toggle="tooltip" data-bs-title="Supprimer"
+                                        onclick="return confirm('Supprimer ce parent ?')">
+                                    🗑️
+                                </button>
+                            </form>
+
+                            <!-- WhatsApp -->
+                            {% if parent.whatsapp_optin and parent.phone_e164 %}
+                            <a href="https://wa.me/{{ parent.phone_e164[1:] }}" target="_blank" 
+                               class="btn btn-sm btn-link text-success" title="WhatsApp"
+                               data-bs-toggle="tooltip" data-bs-title="WhatsApp">
+                                💬
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <em>Aucun parent enregistré</em>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 p-3 bg-light rounded">
+        <h5>📊 Statistiques</h5>
+        <p>
+            <strong>Nombre total de parents :</strong> {{ parents|length }}<br>
+            <strong>Parents avec WhatsApp :</strong> {{ parents|selectattr('whatsapp_optin')|list|length }}<br>
+            <strong>Parents sans téléphone :</strong> {{ parents|rejectattr('phone_e164')|list|length }}
+        </p>
+    </div>
+
+</div>
+
+<script>
+    // Initialiser les tooltips Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+{% endblock %}

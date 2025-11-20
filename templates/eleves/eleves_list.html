@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Liste des élèves{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">Gestion des Élèves</h2>
+
+    <div class="mb-3">
+        <a href="{{ url_for('eleves.add_eleve') }}" class="btn btn-success">
+            ➕ Inscrire un élève
+        </a>
+        <a href="{{ url_for('eleves.import_eleves') }}" class="btn btn-primary">
+            📥 Importer une Classe
+        </a>
+        
+        <!-- Bouton Imprimer -->
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exportModal">
+            🖨️ Imprimer
+        </button>
+    </div>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Classe</th>
+                    <th class="text-center" width="180">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for eleve in students %}
+                <tr>
+                    <td>{{ eleve.id }}</td>
+                    <td>{{ eleve.last_name }}</td>
+                    <td>{{ eleve.first_name }}</td>
+                    <td>{{ eleve.classe.name if eleve.classe else '-' }}</td>
+
+                    <td class="text-center d-flex justify-content-center gap-2">
+                        <!-- Voir -->
+                        <a href="{{ url_for('eleves.details_eleve', id=eleve.id) }}"
+                           class="btn btn-sm btn-link text-info" title="Voir les détails"
+                           data-bs-toggle="tooltip" data-bs-title="Voir">
+                            👁️
+                        </a>
+                        
+                        <!-- Modifier -->
+                        <a href="{{ url_for('eleves.edit_eleve', id=eleve.id) }}"
+                           class="btn btn-sm btn-link text-warning" title="Modifier"
+                           data-bs-toggle="tooltip" data-bs-title="Modifier">
+                            ✏️
+                        </a>
+
+                        <!-- Supprimer -->
+                        <form action="{{ url_for('eleves.delete_eleve', id=eleve.id) }}" method="POST" style="display:inline;">
+                            {{ delete_form.hidden_tag() }}
+                            <button type="submit" class="btn btn-sm btn-link text-danger" title="Supprimer"
+                                    data-bs-toggle="tooltip" data-bs-title="Supprimer"
+                                    onclick="return confirm('Supprimer cet élève ?')">
+                                🗑️
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+
+<!-- Modal d'export -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">🖨️ Exporter une classe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm">
+                    <!-- Sélection de la classe -->
+                    <div class="mb-3">
+                        <label for="selectClass" class="form-label">Classe</label>
+                        <select class="form-select" id="selectClass" name="class_name" required>
+                            <option value="">-- Sélectionner une classe --</option>
+                            <option value="6ème">6ème</option>
+                            <option value="5ème">5ème</option>
+                            <option value="4ème">4ème</option>
+                            <option value="3ème">3ème</option>
+                            <option value="2nde AB">2nde AB</option>
+                            <option value="2nde CD">2nde CD</option>
+                            <option value="1ère AB">1ère AB</option>
+                            <option value="1ère CD">1ère CD</option>
+                            <option value="Tle AB">Tle AB</option>
+                            <option value="Tle CD">Tle CD</option>
+                        </select>
+                    </div>
+
+                    <!-- Sélection du type de fichier -->
+                    <div class="mb-3">
+                        <label for="selectFormat" class="form-label">Type de fichier</label>
+                        <select class="form-select" id="selectFormat" name="format" required>
+                            <option value="">-- Sélectionner un format --</option>
+                            <option value="excel">📊 Excel (.xlsx)</option>
+                            <option value="pdf">📄 PDF</option>
+                            <option value="word">📝 Word (.docx)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="validateAndExport()">✅ Valider</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialiser les tooltips Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    // Fonction pour valider et exporter
+    function validateAndExport() {
+        const className = document.getElementById('selectClass').value;
+        const format = document.getElementById('selectFormat').value;
+
+        if (!className) {
+            alert('Veuillez sélectionner une classe');
+            return;
+        }
+
+        if (!format) {
+            alert('Veuillez sélectionner un type de fichier');
+            return;
+        }
+
+        // Récupérer l'ID de la classe
+        fetch(`/eleves/get-class-id/${encodeURIComponent(className)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.class_id) {
+                    // Fermer le modal et déclencher le téléchargement
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                    modal.hide();
+                    
+                    // Télécharger le fichier
+                    const url = `/eleves/export/${format}/${data.class_id}`;
+                    window.location.href = url;
+                } else {
+                    alert(`Aucun élève trouvé dans la classe "${className}"`);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'export');
+            });
+    }
+
+    // Permettre l'export avec Entrée
+    document.getElementById('selectFormat')?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            validateAndExport();
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques - {{ classe.name }} T{{ term }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>📊 Statistiques des Notes</h1>
+            <h4 class="text-muted">{{ classe.name }} - Trimestre {{ term }}</h4>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('notes.list_notes') }}" class="btn btn-secondary">
+                ← Retour aux notes
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques globales -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Nombre de notes enregistrées</h5>
+                            <h2 class="text-primary">{{ total_notes }}</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Moyenne de la classe</h5>
+                            <h2 class="text-success">
+                                {{ "%.2f"|format(avg_score) }}/20
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par matière -->
+    <div class="row">
+        {% for subject, stats in subjects|dictsort %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📚 {{ subject }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <p class="text-muted">Moyenne</p>
+                            <h4 class="text-success">{{ "%.2f"|format(stats.average) }}/20</h4>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted">Nombre de notes</p>
+                            <h4 class="text-primary">{{ stats.count }}</h4>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="text-muted small">Min</p>
+                            <p>{{ "%.2f"|format(stats.min) }}/20</p>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted small">Max</p>
+                            <p>{{ "%.2f"|format(stats.max) }}/20</p>
+                        </div>
+                    </div>
+
+                    <!-- Mini graphique -->
+                    <div class="mt-3">
+                        <div class="progress" style="height: 30px;">
+                            {% set pct = (stats.average / 20) * 100 %}
+                            <div class="progress-bar {% if stats.average >= 15 %}bg-success{% elif stats.average >= 10 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ pct }}%" 
+                                 aria-valuenow="{{ pct }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ "%.1f"|format(pct) }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not subjects %}
+    <div class="alert alert-info text-center">
+        ℹ️ Aucune donnée de notes pour cette classe et trimestre.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Notes{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>📋 Gestion des Notes</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('notes.daily_entry') }}" class="btn btn-primary me-2">
+                ➕ Saisie Quotidienne
+            </a>
+            <a href="{{ url_for('notes.add_note') }}" class="btn btn-info">
+                ➕ Ajouter Note (Individuelle)
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('notes.list_notes') }}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="class_filter" class="form-label"><strong>Classe</strong></label>
+                    <select id="class_filter" name="class_id" class="form-select">
+                        <option value="">-- Toutes les classes --</option>
+                        {% for classe in classes %}
+                        <option value="{{ classe.id }}" {% if selected_class == classe.id %}selected{% endif %}>
+                            {{ classe.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="subject_filter" class="form-label"><strong>Matière</strong></label>
+                    <select name="subject" id="subject_filter" class="form-select">
+                        <option value="">-- Toutes les matières --</option>
+                        <option value="Communication écrite" {% if selected_subject == 'Communication écrite' %}selected{% endif %}>Communication écrite</option>
+                        <option value="Lecture" {% if selected_subject == 'Lecture' %}selected{% endif %}>Lecture</option>
+                        <option value="Français" {% if selected_subject == 'Français' %}selected{% endif %}>Français</option>
+                        <option value="Histoire et Géographie" {% if selected_subject == 'Histoire et Géographie' %}selected{% endif %}>Histoire et Géographie</option>
+                        <option value="Anglais" {% if selected_subject == 'Anglais' %}selected{% endif %}>Anglais</option>
+                        <option value="SVT" {% if selected_subject == 'SVT' %}selected{% endif %}>SVT</option>
+                        <option value="PCT" {% if selected_subject == 'PCT' %}selected{% endif %}>PCT</option>
+                        <option value="Mathématique" {% if selected_subject == 'Mathématique' %}selected{% endif %}>Mathématique</option>
+                        <option value="Espagnole" {% if selected_subject == 'Espagnole' %}selected{% endif %}>Espagnole</option>
+                        <option value="Philosophie" {% if selected_subject == 'Philosophie' %}selected{% endif %}>Philosophie</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="term_filter" class="form-label"><strong>Trimestre</strong></label>
+                    <select id="term_filter" name="term" class="form-select">
+                        <option value="">-- Tous les trimestres --</option>
+                        <option value="1" {% if selected_term == 1 %}selected{% endif %}>1er Trimestre</option>
+                        <option value="2" {% if selected_term == 2 %}selected{% endif %}>2ème Trimestre</option>
+                        <option value="3" {% if selected_term == 3 %}selected{% endif %}>3ème Trimestre</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="date_filter" class="form-label"><strong>Date</strong></label>
+                    <input type="date" id="date_filter" name="date" class="form-control" value="{{ selected_date or '' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        🔍 Filtrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des notes -->
+    {% if notes %}
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">📊 {{ notes|length }} note(s) trouvée(s)</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <form method="POST" action="{{ url_for('notes.bulk_delete') }}" id="bulkDeleteForm">
+                    <thead class="table-light">
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleAllNotes(this)"></th>
+                            <th>📅 Date</th>
+                            <th>👤 Élève</th>
+                            <th>📚 Matière</th>
+                            <th>🎯 Type</th>
+                            <th class="text-center">📊 Note</th>
+                            <th class="text-center">/20</th>
+                            <th>T#</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for note in notes %}
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" name="note_ids" value="{{ note.id }}">
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ note.date.strftime('%d/%m/%Y') }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ note.student.full_name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ note.student.classe.name if note.student.classe else 'N/A' }}</small>
+                            </td>
+                            <td>{{ note.subject }}</td>
+                            <td>
+                                <span class="badge bg-info">{{ note.assessment_type_display }}</span>
+                            </td>
+                            <td class="text-center">
+                                <strong>{{ "%.2f"|format(note.score) }}</strong>
+                            </td>
+                            <td class="text-center">
+                                <em class="text-success">{{ "%.2f"|format(note.normalized_score(20.0)) }}</em>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">T{{ note.term }}</span>
+                            </td>
+                            <td class="text-center">
+                                <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+                                    <a href="{{ url_for('notes.edit_note', id=note.id) }}" 
+                                       class="btn btn-sm btn-warning" title="Modifier">
+                                        ✏️
+                                    </a>
+                                    <form method="POST" action="{{ url_for('notes.delete_note', id=note.id) }}" 
+                                          style="display: inline; margin: 0;" 
+                                          onsubmit="return confirm('Êtes-vous sûr ?')">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                            🗑️
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9" class="text-end">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Supprimer les notes sélectionnées ?')">🗑️ Supprimer la sélection</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </form>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        ℹ️ Aucune note trouvée selon les critères sélectionnés.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

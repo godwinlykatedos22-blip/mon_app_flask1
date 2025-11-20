@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Correspondance WhatsApp - Notes{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="mb-0">📱 Correspondance WhatsApp</h1>
+            <p class="text-muted">Envoyez les notes du jour ou un message personnalisé aux parents via WhatsApp</p>
+        </div>
+    </div>
+
+    <!-- Sous-sections -->
+    <ul class="nav nav-tabs mb-3" id="correspondanceTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="envoi-notes-tab" data-bs-toggle="tab" data-bs-target="#envoi-notes" type="button" role="tab">Envoi des notes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="message-personnalise-tab" data-bs-toggle="tab" data-bs-target="#message-personnalise" type="button" role="tab">Message personnalisé</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="correspondanceTabsContent">
+        <!-- Sous-section Envoi des notes -->
+        <div class="tab-pane fade show active" id="envoi-notes" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Sélectionner une classe et une date</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="class_id" class="form-label">Classe</label>
+                            <select class="form-select" name="class_id" id="class_id" required>
+                                <option value="">-- Sélectionner une classe --</option>
+                                {% for classe in classes %}
+                                    <option value="{{ classe.id }}" {% if selected_class and selected_class.id == classe.id %}selected{% endif %}>
+                                        {{ classe.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" id="date" value="{{ selected_date or '' }}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Afficher les notes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Notes Table -->
+            {% if students_notes %}
+                <form method="POST">
+                    <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+                    <input type="hidden" name="date" value="{{ selected_date }}">
+                    <div class="card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Notes du jour</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Élève</th>
+                                        <th>Notes</th>
+                                        <th>Parents WhatsApp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students_notes %}
+                                        <tr>
+                                            <td><input type="checkbox" name="selected_students" value="{{ student.id }}" checked></td>
+                                            <td>{{ student.name }}</td>
+                                            <td>
+                                                {% for note in student.notes %}
+                                                    <div>{{ note.subject }} : {{ (note.score|string).replace('.00','') if note.score == note.score|int else (note.score|string).replace('.00','')|replace('.',',') }}/{{ note.max_score }} ({{ note.assessment_type_display }})</div>
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% for parent in student.parents %}
+                                                    {% if parent.whatsapp_optin and parent.phone_e164 %}
+                                                        <span class="badge bg-success">{{ parent.full_name }} ({{ parent.phone_e164 }})</span><br>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">{{ parent.full_name }} (Non WhatsApp)</span><br>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="submit" name="action" value="send_notes" class="btn btn-lg btn-primary">Envoyer les notes WhatsApp</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="alert alert-warning mt-4">Aucune note disponible pour cette classe et cette date.</div>
+            {% endif %}
+        </div>
+
+        <!-- Sous-section Message personnalisé -->
+        <div class="tab-pane fade" id="message-personnalise" role="tabpanel">
+            <div class="card mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Envoyer un message personnalisé</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Sélectionner les élèves</label>
+                            <div class="card p-2" style="max-height: 260px; overflow-y: auto; border: 1px solid #ccc;">
+                                <div class="row">
+                                    {% for student in students %}
+                                    <div class="col-12 mb-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="student_ids" id="student_{{ student.id }}" value="{{ student.id }}">
+                                            <label class="form-check-label" for="student_{{ student.id }}">
+                                                <strong>{{ student.full_name }}</strong>
+                                                {% for parent in student.parents %}
+                                                    {% if parent.whatsapp_optin and parent.phone_e164 %}
+                                                        <span class="badge bg-success ms-2">{{ parent.full_name }} ({{ parent.phone_e164 }})</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Cochez les élèves à contacter. Les messages seront envoyés aux parents WhatsApp des élèves sélectionnés.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ou cibler une classe</label>
+                            <select name="class_id" class="form-select">
+                                <option value="">-- Aucune classe --</option>
+                                {% for classe in classes %}
+                                    <option value="{{ classe.id }}">{{ classe.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Si des parents sont sélectionnés, ils priment.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea name="personal_message" class="form-control" rows="6" placeholder="Écrivez votre message ici..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button name="action" value="personal_preview" type="submit" class="btn btn-outline-secondary">Aperçu</button>
+                            <button name="action" value="personal_send" type="submit" class="btn btn-primary" onclick="return confirm('Confirmer l\'envoi du message personnalisé ?');">Envoyer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{% if user %}Modifier{% else %}Créer{% endif %} un Compte{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{% if user %}✏️ Modifier le compte{% else %}➕ Créer un compte{% endif %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ user.email if user else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nom *</label>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ user.name if user else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                Mot de passe {% if user %}<small class="text-muted">(Laisser vide pour ne pas changer)</small>{% else %}*{% endif %}
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   {% if not user %}required{% endif %}>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Rôle *</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">-- Sélectionner un rôle --</option>
+                                <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>
+                                    👑 Administrateur
+                                </option>
+                                <option value="director" {% if user and user.role == 'director' %}selected{% endif %}>
+                                    📋 Directeur
+                                </option>
+                                <option value="teacher" {% if user and user.role == 'teacher' %}selected{% endif %}>
+                                    👨‍🏫 Professeur
+                                </option>
+                            </select>
+                            <small class="form-text">
+                                <strong>Admin :</strong> Accès complet | 
+                                <strong>Directeur :</strong> Gestion des données | 
+                                <strong>Professeur :</strong> Saisie des notes
+                            </small>
+                        </div>
+
+                        {% if user %}
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
+                                   {% if user.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Compte actif
+                            </label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if user %}✓ Modifier{% else %}✓ Créer{% endif %}
+                            </button>
+                            <a href="{{ url_for('accounts.list_accounts') }}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}{% if note %}Modifier{% else %}Ajouter{% endif %} une Note{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">
+                {% if note %}
+                    ✏️ Modifier la Note
+                {% else %}
+                    ➕ Ajouter une Note
+                {% endif %}
+            </h1>
+
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            {{ form.student_id.label(class="form-label") }}
+                            {{ form.student_id(class="form-select") }}
+                            {% if form.student_id.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.student_id.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.subject.label(class="form-label") }}
+                            {{ form.subject(class="form-control") }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.subject.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.assessment_type.label(class="form-label") }}
+                                {{ form.assessment_type(class="form-select") }}
+                                {% if form.assessment_type.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.assessment_type.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                {{ form.term.label(class="form-label") }}
+                                {{ form.term(class="form-select") }}
+                                {% if form.term.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.term.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                {{ form.score.label(class="form-label") }}
+                                {{ form.score(class="form-control") }}
+                                {% if form.score.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.score.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                {{ form.max_score.label(class="form-label") }}
+                                {{ form.max_score(class="form-control") }}
+                                {% if form.max_score.errors %}
+                                    <div class="text-danger small">
+                                        {% for error in form.max_score.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <div class="form-text text-center mt-4">
+                                    <strong id="normalized_score">0.00</strong> / 20
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date(class="form-control", type="date") }}
+                            {% if form.date.errors %}
+                                <div class="text-danger small">
+                                    {% for error in form.date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                            <a href="{{ url_for('notes.list_notes') }}" class="btn btn-secondary btn-lg">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+// Calcul dynamique de la note normalisée /20
+document.addEventListener('DOMContentLoaded', function() {
+    const scoreInput = document.querySelector('input[name="score"]');
+    const maxScoreInput = document.querySelector('input[name="max_score"]');
+    const normalizedDisplay = document.getElementById('normalized_score');
+
+    function updateNormalized() {
+        const score = parseFloat(scoreInput.value) || 0;
+        const maxScore = parseFloat(maxScoreInput.value) || 20;
+        const normalized = maxScore > 0 ? (score / maxScore) * 20 : 0;
+        normalizedDisplay.textContent = normalized.toFixed(2);
+    }
+
+    if (scoreInput) scoreInput.addEventListener('input', updateNormalized);
+    if (maxScoreInput) maxScoreInput.addEventListener('input', updateNormalized);
+    updateNormalized();
+});
+</script>
+{% endblock %}

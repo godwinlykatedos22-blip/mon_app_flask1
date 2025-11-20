@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Bulletin - {{ student.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>📋 Bulletin Trimestriel</h1>
+            <h4 class="text-muted">{{ student.full_name }} - Trimestre {{ term }}</h4>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('notes.list_notes') }}" class="btn btn-secondary">
+                ← Retour aux notes
+            </a>
+        </div>
+    </div>
+
+    <!-- Infos élève -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>👤 Élève:</strong> {{ student.full_name }}</p>
+                    <p><strong>🎓 Classe:</strong> {{ student.classe.name if student.classe else 'N/A' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>📅 Date de naissance:</strong> {{ student.birthdate.strftime('%d/%m/%Y') if student.birthdate else 'N/A' }}</p>
+                    <p><strong>📊 Trimestre:</strong> T{{ term }}/3</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau récapitulatif -->
+    {% if assessments %}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📊 Récapitulatif des notes</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>📚 Matière</th>
+                        <th class="text-center">❓ Interrogations</th>
+                        <th class="text-center">📝 Devoirs</th>
+                        <th class="text-center">📋 Compositions</th>
+                        <th class="text-center text-success"><strong>Moyenne</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject, stats in subjects_stats.items() %}
+                    <tr>
+                        <td><strong>{{ subject }}</strong></td>
+                        <td class="text-center">
+                            {% if 'interrogation' in stats.types %}
+                                {{ "%.2f"|format(stats.types['interrogation_avg']) }}/20
+                                <small>({{ stats.types['interrogation']|length }} notes)</small>
+                            {% else %}
+                                <em class="text-muted">—</em>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if 'devoir' in stats.types %}
+                                {{ "%.2f"|format(stats.types['devoir_avg']) }}/20
+                                <small>({{ stats.types['devoir']|length }} notes)</small>
+                            {% else %}
+                                <em class="text-muted">—</em>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if 'composition' in stats.types %}
+                                {{ "%.2f"|format(stats.types['composition_avg']) }}/20
+                                <small>({{ stats.types['composition']|length }} notes)</small>
+                            {% else %}
+                                <em class="text-muted">—</em>
+                            {% endif %}
+                        </td>
+                        <td class="text-center text-success">
+                            <strong>{{ "%.2f"|format(stats.average) }}/20</strong>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Toutes les notes détaillées -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">📋 Détail de toutes les notes ({{ assessments|length }} au total)</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>📅 Date</th>
+                        <th>📚 Matière</th>
+                        <th>🎯 Type</th>
+                        <th class="text-center">📊 Note</th>
+                        <th class="text-center">/20</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assessment in assessments %}
+                    <tr>
+                        <td>
+                            <small>{{ assessment.date.strftime('%d/%m/%Y') }}</small>
+                        </td>
+                        <td>{{ assessment.subject }}</td>
+                        <td>
+                            <small>{{ assessment.assessment_type_display }}</small>
+                        </td>
+                        <td class="text-center">
+                            <strong>{{ "%.2f"|format(assessment.score) }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <em class="text-success">{{ "%.2f"|format(assessment.normalized_score(20.0)) }}</em>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-info text-center">
+        ℹ️ Aucune note enregistrée pour ce trimestre.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

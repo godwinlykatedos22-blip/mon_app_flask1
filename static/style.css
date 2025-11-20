@@ -1,0 +1,837 @@
+/* ============================================
+   COULEURS PRINCIPALES (Palette Gris Sophistiquée + Doré)
+   ============================================ */
+:root {
+    --primary-color: #2c3e50;       /* Gris-bleu foncé élégant */
+    --secondary-color: #d4a574;     /* Doré/Beige chaud */
+    --accent-color: #34495e;        /* Gris-bleu moyen */
+    --light-accent: #7f8c8d;        /* Gris clair */
+    --success-color: #27ae60;        /* Vert succès */
+    --danger-color: #e74c3c;         /* Rouge danger */
+    --warning-color: #f39c12;        /* Orange warning */
+    --info-color: #3498db;           /* Bleu info */
+    --light-bg: #ecf0f1;             /* Fond très clair */
+    --dark-text: #1a1a1a;            /* Texte foncé */
+    --shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    --shadow-hover: 0 8px 25px rgba(44, 62, 80, 0.25);
+}
+
+/* ============================================
+   STYLE GLOBAL
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Times New Roman', Times, serif;
+    color: var(--dark-text);
+    background-color: var(--light-bg);
+}
+/* ============================================
+   TABLEAU ICÔNES NAVIGATION
+   ============================================ */
+.icon-table {
+    width: auto;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+.icon-table td {
+    padding: 2px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+.icon-table i {
+    font-size: 1.3em;
+}
+
+/* Réduction de l'interligne des tableaux */
+table {
+    border-collapse: collapse;
+}
+table td, table th {
+    padding: 4px 8px;
+    line-height: 1.1;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   NAVIGATION BAR PROFESSIONNELLE
+   ============================================ */
+/* ============================================
+   NAVIGATION BAR PROFESSIONNELLE
+   ============================================ */
+.professional-navbar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, #1a252f 100%);
+    border-bottom: 3px solid var(--secondary-color);
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.navbar-logo {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.navbar-logo-circle {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: floatAnimation 3s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.navbar-logo-circle:hover {
+    animation: none;
+    transform: scale(1.08) rotate(10deg);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-logo-circle img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar-brand-text {
+    color: white !important;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: white !important;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: var(--secondary-color) !important;
+    background-color: rgba(212, 165, 116, 0.1);
+}
+
+.nav-link.active {
+    color: var(--secondary-color) !important;
+    background-color: rgba(212, 165, 116, 0.15);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+/* ============================================
+   FOOTER PROFESSIONNEL
+   ============================================ */
+/* ============================================
+   FOOTER PROFESSIONNEL
+   ============================================ */
+.professional-footer {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, #1a252f 100%);
+    border-top: 3px solid var(--secondary-color);
+    margin-top: auto;
+    box-shadow: 0 -6px 20px rgba(44, 62, 80, 0.2);
+}
+
+.professional-footer p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.professional-footer strong {
+    color: var(--secondary-color);
+}
+
+/* ============================================
+   CARTES (CARDS)
+   ============================================ */
+/* ============================================
+   CARTES (CARDS)
+   ============================================ */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    background: white;
+    overflow: hidden;
+    position: relative;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.card:hover::before {
+    left: 100%;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 50%, #1a252f 100%);
+    color: white;
+    border: none;
+    border-radius: 12px 12px 0 0;
+    font-weight: 700;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--secondary-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* ============================================
+   BOUTONS
+   ============================================ */
+.btn {
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 0.7rem 1.4rem;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.7px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(44, 62, 80, 0.3);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+}
+
+.btn-secondary:hover {
+    background-color: #c89860;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+}
+
+.btn-success:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+}
+
+.btn-danger:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #e67e22 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+}
+
+.btn-warning:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(243, 156, 18, 0.3);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #2980b9 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+}
+
+.btn-info:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+
+.btn-lg {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   FORMULAIRES
+   ============================================ */
+.form-control,
+.form-select {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.95rem;
+    transition: all 0.4s ease;
+    background-color: white;
+}
+
+.form-control::placeholder {
+    color: #95a5a6;
+    opacity: 1;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 0.3rem rgba(212, 165, 116, 0.15), inset 0 1px 2px rgba(0,0,0,0.05);
+    background-color: #fafbfc;
+}
+
+.form-label {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+}
+
+.badge-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+/* ============================================
+   TABLES
+   ============================================ */
+.table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.table thead {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.table thead th {
+    border: none;
+    padding: 1.2rem;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(90deg, rgba(212, 165, 116, 0.05), rgba(44, 62, 80, 0.03));
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* ============================================
+   ALERTES
+   ============================================ */
+.alert {
+    border: none;
+    border-left: 4px solid;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left-color: var(--success-color);
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left-color: var(--danger-color);
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left-color: var(--warning-color);
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left-color: var(--info-color);
+}
+
+/* ============================================
+   HEADERS ET TITRES
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+h1 {
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+.card-title {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+}
+
+.subtitle, .text-muted, .small, .form-text {
+    color: #34495e !important;
+    font-weight: 500;
+}
+
+.navbar-text, .navbar-brand-text {
+    color: white !important;
+}
+
+/* ============================================
+   STATISTIQUES (DASHBOARD)
+   ============================================ */
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    border-top: 5px solid var(--secondary-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(212, 165, 116, 0.1), transparent);
+    border-radius: 50%;
+}
+
+.stats-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stats-card-value {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 1rem 0;
+}
+
+.stats-card-label {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    font-weight: 700;
+}
+
+/* ============================================
+   ICÔNES
+   ============================================ */
+.fa {
+    margin-right: 0.6rem;
+    transition: all 0.3s ease;
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(44, 62, 80, 0.2);
+    transition: all 0.4s ease;
+}
+
+.icon-box:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+}
+
+/* ============================================
+   PAGES SPÉCIFIQUES
+   ============================================ */
+
+/* Page de Connexion */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 200px);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2.5rem;
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo img {
+    max-width: 100px;
+    height: auto;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .navbar-logo {
+        height: 40px;
+    }
+
+    .stats-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-lg {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .card-header {
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .professional-navbar {
+        padding: 0.5rem 0;
+    }
+
+    .navbar-brand {
+        font-size: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .stats-card-value {
+        font-size: 2rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(44, 62, 80, 0.25);
+    }
+}
+
+@keyframes floatAnimation {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.card {
+    animation: slideInDown 0.5s ease;
+}
+
+.stats-card {
+    animation: fadeInUp 0.5s ease;
+}
+
+/* ============================================
+   UTILITAIRES
+   ============================================ */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-secondary {
+    color: var(--secondary-color) !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%) !important;
+}
+
+.bg-light {
+    background-color: var(--light-bg) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+.border-secondary {
+    border-color: var(--secondary-color) !important;
+}
+
+/* ============================================
+   OMBRES ÉLÉGANTES
+   ============================================ */
+.shadow-sm {
+    box-shadow: 0 1px 3px rgba(13, 74, 122, 0.08) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(13, 74, 122, 0.15) !important;
+}
+
+/* =============================
+   BOUTONS
+============================= */
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: scale(1.03);
+}
+
+/* =============================
+   FORMULAIRES
+============================= */
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* =============================
+   ALERTES
+============================= */
+
+.alert {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* =============================
+   TABLEAU DE BORD
+============================= */
+
+.card {
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* =============================
+   PIED DE PAGE
+============================= */
+
+footer {
+    font-size: 0.9rem;
+    background-color: #f1f1f1;
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+}

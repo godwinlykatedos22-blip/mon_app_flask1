@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Migrate DB for SchoolYear",
+			"type": "shell",
+			"command": "flask db migrate -m \"Ajout du modèle SchoolYear\"; flask db upgrade",
+			"args": [],
+			"problemMatcher": []
+		},
+		{
+			"label": "Initialiser migrations DB",
+			"type": "shell",
+			"command": "flask db init",
+			"args": [],
+			"problemMatcher": []
+		},
+		{
+			"label": "Migrate DB for SchoolYear",
+			"type": "shell",
+			"command": "flask db migrate -m \"Ajout du modèle SchoolYear\"; flask db upgrade",
+			"args": [],
+			"problemMatcher": []
+		}
+	]
+}

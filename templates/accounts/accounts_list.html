@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Comptes Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h2>Gestion des Comptes Utilisateurs</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('accounts.add_account') }}" class="btn btn-success">
+                ➕ Créer un compte
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'info' if category == 'info' else 'warning' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Nom</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th>Créé le</th>
+                    <th class="text-center" width="200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if users %}
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td><strong>{{ user.email }}</strong></td>
+                        <td>{{ user.name }}</td>
+                        <td>
+                            {% if user.role == 'admin' %}
+                                <span class="badge bg-danger">👑 Admin</span>
+                            {% elif user.role == 'director' %}
+                                <span class="badge bg-warning text-dark">📋 Directeur</span>
+                            {% else %}
+                                <span class="badge bg-info">👨‍🏫 Professeur</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge bg-success">✓ Actif</span>
+                            {% else %}
+                                <span class="badge bg-secondary">✗ Inactif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ user.created_at.strftime('%d/%m/%Y') }}</small>
+                        </td>
+                        <td class="text-center d-flex justify-content-center gap-2">
+                            <!-- Modifier -->
+                            <a href="{{ url_for('accounts.edit_account', id=user.id) }}"
+                               class="btn btn-sm btn-link text-warning" title="Modifier"
+                               data-bs-toggle="tooltip" data-bs-title="Modifier">
+                                ✏️
+                            </a>
+
+                            <!-- Activer/Désactiver -->
+                            {% if user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('accounts.toggle_account_status', id=user.id) }}" style="display:inline;">
+                                <button type="submit" 
+                                        class="btn btn-sm btn-link {% if user.is_active %}text-secondary{% else %}text-success{% endif %}"
+                                        title="{% if user.is_active %}Désactiver{% else %}Activer{% endif %}"
+                                        data-bs-toggle="tooltip" 
+                                        data-bs-title="{% if user.is_active %}Désactiver{% else %}Activer{% endif %}">
+                                    {% if user.is_active %}🔒{% else %}🔓{% endif %}
+                                </button>
+                            </form>
+                            {% endif %}
+
+                            <!-- Supprimer -->
+                            {% if user.id != current_user.id %}
+                            <form action="{{ url_for('accounts.delete_account', id=user.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-link text-danger" title="Supprimer"
+                                        data-bs-toggle="tooltip" data-bs-title="Supprimer"
+                                        onclick="return confirm('Supprimer ce compte ?')">
+                                    🗑️
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <em>Aucun compte utilisateur</em>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 p-3 bg-light rounded">
+        <h5>📊 Statistiques</h5>
+        <p>
+            <strong>Nombre total de comptes :</strong> {{ users|length }}<br>
+            <strong>Administrateurs :</strong> {{ users|selectattr('role', 'equalto', 'admin')|list|length }}<br>
+            <strong>Directeurs :</strong> {{ users|selectattr('role', 'equalto', 'director')|list|length }}<br>
+            <strong>Professeurs :</strong> {{ users|selectattr('role', 'equalto', 'teacher')|list|length }}<br>
+            <strong>Comptes actifs :</strong> {{ users|selectattr('is_active')|list|length }}
+        </p>
+    </div>
+
+</div>
+
+<script>
+    // Initialiser les tooltips Bootstrap
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+{% endblock %}

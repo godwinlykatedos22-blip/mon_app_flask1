@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des Notes - Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <span class="text-white" style="font-size: 32px;">📊</span>
+                    </div>
+                    <div>
+                        <h1 class="mb-0">Gestion des Notes</h1>
+                        <p class="text-muted mb-0">Vue d'ensemble et historique des notes enregistrées</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('notes.notes_entry_by_class') }}" class="btn btn-lg btn-success">
+                    ➕ Saisir des Notes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Statistiques Globales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary shadow">
+                <div class="card-body text-center">
+                    <h2 class="text-primary mb-0">{{ total_notes }}</h2>
+                    <p class="text-muted mb-0">Notes Totales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success shadow">
+                <div class="card-body text-center">
+                    <h2 class="text-success mb-0">{{ total_classes }}</h2>
+                    <p class="text-muted mb-0">Classes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-info shadow">
+                <div class="card-body text-center">
+                    <h2 class="text-info mb-0">{{ total_subjects }}</h2>
+                    <p class="text-muted mb-0">Matières</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning shadow">
+                <div class="card-body text-center">
+                    <h2 class="text-warning mb-0">{{ notes_today }}</h2>
+                    <p class="text-muted mb-0">Notes Aujourd'hui</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et Recherche -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-secondary shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0 text-white">🔍 Filtrer les Notes</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="class_filter" class="form-label"><strong>Classe</strong></label>
+                            <select name="class_id" id="class_filter" class="form-select">
+                                <option value="">-- Toutes les classes --</option>
+                                {% for classe in classes %}
+                                    <option value="{{ classe.id }}" {% if selected_class_id == classe.id %}selected{% endif %}>
+                                        {{ classe.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="subject_filter" class="form-label"><strong>Matière</strong></label>
+                            <select name="subject" id="subject_filter" class="form-select">
+                                <option value="">-- Toutes les matières --</option>
+                                {% for subject in subjects %}
+                                    <option value="{{ subject }}" {% if selected_subject == subject %}selected{% endif %}>
+                                        {{ subject }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="term_filter" class="form-label"><strong>Trimestre</strong></label>
+                            <select name="term" id="term_filter" class="form-select">
+                                <option value="">-- Tous les trimestres --</option>
+                                <option value="1" {% if selected_term == 1 %}selected{% endif %}>1er Trimestre</option>
+                                <option value="2" {% if selected_term == 2 %}selected{% endif %}>2ème Trimestre</option>
+                                <option value="3" {% if selected_term == 3 %}selected{% endif %}>3ème Trimestre</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="date_filter" class="form-label"><strong>Date</strong></label>
+                            <input type="date" name="date" id="date_filter" class="form-control" value="{{ selected_date or '' }}">
+                        </div>
+
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                🔎 Filtrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Récapitulatif par Type d'Évaluation -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-info shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0 text-white">📈 Récapitulatif par Type d'Évaluation</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Interrogations -->
+                        <div class="col-md-4">
+                            <div class="card border-warning mb-0">
+                                <div class="card-body">
+                                    <h6 class="card-title">❓ Interrogations</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Nombre:</span>
+                                        <strong class="text-warning">{{ assessment_types_summary.interrogation.count or 0 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Moyenne:</span>
+                                        <strong class="text-warning">{{ assessment_types_summary.interrogation.average|round(2) if assessment_types_summary.interrogation.average else 'N/A' }}</strong>
+                                    </div>
+                                    {% if not assessment_types_summary.interrogation.count %}
+                                        <p class="text-muted small mb-0 mt-2">Aucune donnée enregistrée</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Devoirs -->
+                        <div class="col-md-4">
+                            <div class="card border-success mb-0">
+                                <div class="card-body">
+                                    <h6 class="card-title">📚 Devoirs</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Nombre:</span>
+                                        <strong class="text-success">{{ assessment_types_summary.devoir.count or 0 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Moyenne:</span>
+                                        <strong class="text-success">{{ assessment_types_summary.devoir.average|round(2) if assessment_types_summary.devoir.average else 'N/A' }}</strong>
+                                    </div>
+                                    {% if not assessment_types_summary.devoir.count %}
+                                        <p class="text-muted small mb-0 mt-2">Aucune donnée enregistrée</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Compositions -->
+                        <div class="col-md-4">
+                            <div class="card border-danger mb-0">
+                                <div class="card-body">
+                                    <h6 class="card-title">📋 Compositions</h6>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Nombre:</span>
+                                        <strong class="text-danger">{{ assessment_types_summary.composition.count or 0 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Moyenne:</span>
+                                        <strong class="text-danger">{{ assessment_types_summary.composition.average|round(2) if assessment_types_summary.composition.average else 'N/A' }}</strong>
+                                    </div>
+                                    {% if not assessment_types_summary.composition.count %}
+                                        <p class="text-muted small mb-0 mt-2">Aucune donnée enregistrée</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des Notes Détaillées -->
+    <div class="row">
+        <div class="col-md-12">
+            {% if assessments %}
+            <div class="card border-primary shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">📋 Historique des Notes</h5>
+                    <span class="badge bg-light text-dark">{{ assessments|length }} note(s)</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>📅 Date</th>
+                                <th>👤 Élève</th>
+                                <th>🏫 Classe</th>
+                                <th>📚 Matière</th>
+                                <th>📝 Type</th>
+                                <th>✏️ Trimestre</th>
+                                <th>📊 Note</th>
+                                <th>⭐ Rendement /20</th>
+                                <th>🔧 Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assessment in assessments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ assessment.date.strftime('%d/%m/%Y') }}</strong>
+                                </td>
+                                <td>{{ assessment.student.full_name }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ assessment.student.classe.name }}</span>
+                                </td>
+                                <td>{{ assessment.subject }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ assessment.assessment_type_display }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-warning text-dark">T{{ assessment.term }}</span>
+                                </td>
+                                <td>
+                                    <strong>{{ assessment.score }}/{{ assessment.max_score }}</strong>
+                                </td>
+                                <td>
+                                    {% set rendement = assessment.normalized_score(20.0) %}
+                                    {% if rendement >= 16 %}
+                                        <span class="badge bg-success">{{ rendement|round(2) }}/20</span>
+                                    {% elif rendement >= 12 %}
+                                        <span class="badge bg-info">{{ rendement|round(2) }}/20</span>
+                                    {% elif rendement >= 8 %}
+                                        <span class="badge bg-warning text-dark">{{ rendement|round(2) }}/20</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ rendement|round(2) }}/20</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if current_user.is_admin() or current_user.is_director() %}
+                                        <a href="{{ url_for('notes.edit_note', id=assessment.id) }}" class="btn btn-sm btn-warning">✏️</a>
+                                        <form method="POST" action="{{ url_for('notes.delete_note', id=assessment.id) }}" style="display: inline;" onsubmit="return confirm('Supprimer cette note?');">
+                                            <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">📭</div>
+                    <h4 class="text-muted">Aucune note trouvée</h4>
+                    <p class="text-muted">
+                        Commencez par <a href="{{ url_for('notes.notes_entry_by_class') }}" class="link-primary">saisir des notes</a>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}

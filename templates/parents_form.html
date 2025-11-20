@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}{% if edit %}Modifier{% else %}Ajouter{% endif %} un Parent{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>{% if edit %}Modifier{% else %}Ajouter{% endif %} un Parent/Tuteur</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('parents.list_parents') }}" class="btn btn-secondary">← Retour</a>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    {% if form.first_name.errors %}
+                        {{ form.first_name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.first_name(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="last_name" class="form-label">Nom</label>
+                    {% if form.last_name.errors %}
+                        {{ form.last_name(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.last_name(class="form-control") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone_e164" class="form-label">Téléphone (format E.164)</label>
+                    <small class="form-text text-muted d-block mb-2">Exemple : +33612345678</small>
+                    {% if form.phone_e164.errors %}
+                        {{ form.phone_e164(class="form-control is-invalid", placeholder="+33...") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.phone_e164.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.phone_e164(class="form-control", placeholder="+33...") }}
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.whatsapp_optin(class="form-check-input") }}
+                    <label for="whatsapp_optin" class="form-check-label">
+                        Parent inscrit sur WhatsApp
+                    </label>
+                </div>
+
+                <div class="mt-4">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('parents.list_parents') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 bg-light rounded">
+        <h5>ℹ️ Information</h5>
+        <p class="text-muted mb-0">
+            Les parents sont automatiquement synchronisés lors de l'inscription des élèves.
+            Vous pouvez les modifier ici si nécessaire.
+        </p>
+    </div>
+
+</div>
+{% endblock %}

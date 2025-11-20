@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes</title>
+</head>
+<body>
+    <h1>Notes</h1>
+    <form>
+        <div class="mb-3">
+            <label for="subject" class="form-label">Matière</label>
+            <select class="form-select" name="subject" id="subject" required>
+                <option value="">-- Sélectionner une matière --</option>
+                <option value="Comunication écrite">Comunication écrite</option>
+                <option value="Lecture">Lecture</option>
+                <option value="Français">Français</option>
+                <option value="Histoire et géographie">Histoire et géographie</option>
+                <option value="Anglais">Anglais</option>
+                <option value="SVT">SVT</option>
+                <option value="PCT">PCT</option>
+                <option value="Espagnole">Espagnole</option>
+                <option value="Philosophie">Philosophie</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="note" class="form-label">Note</label>
+            <input type="number" class="form-control" name="note" id="note" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Soumettre</button>
+    </form>
+</body>
+</html>

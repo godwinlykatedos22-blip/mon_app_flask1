@@ -1,0 +1,15 @@
+from app import create_app
+from models import db, User
+
+app = create_app()
+with app.app_context():
+    # Vérifiez si l'utilisateur existe déjà
+    existing_user = User.query.filter_by(email='admin@test.com').first()
+    if existing_user:
+        print("L'utilisateur avec cet e-mail existe déjà.")
+    else:
+        admin = User(email='admin@test.com', name='Admin', role='admin')
+        admin.set_password('admin123')
+        db.session.add(admin)
+        db.session.commit()
+        print("Utilisateur créé avec succès.")

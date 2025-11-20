@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Importer des élèves{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Importer des élèves via Excel</h2>
+    <a href="{{ url_for('student.download_template') }}" class="btn btn-success mt-3">
+    Télécharger le modèle Excel
+    </a>
+
+    <div class="alert alert-info mt-3">
+        Le fichier Excel doit contenir les colonnes suivantes :<br>
+        <strong>Nom | Prénom | Classe</strong>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label class="form-label">Sélectionnez un fichier Excel (.xlsx)</label>
+            <input type="file" name="excel_file" class="form-control" accept=".xlsx" required>
+        </div>
+
+        <button class="btn btn-primary">Importer</button>
+        <a href="{{ url_for('student.list_students') }}" class="btn btn-secondary">Retour</a>
+    </form>
+
+    <hr>
+
+    <h4>Exemple de fichier :</h4>
+    <table class="table table-bordered w-50">
+        <thead class="table-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Classe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Dupont</td><td>Sarah</td><td>5ème</td></tr>
+            <tr><td>Kouassi</td><td>Jean</td><td>4ème</td></tr>
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

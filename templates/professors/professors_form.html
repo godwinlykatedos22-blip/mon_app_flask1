@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{% if professor %}Modifier{% else %}Ajouter{% endif %} un Professeur{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{% if professor %}✏️ Modifier le professeur{% else %}➕ Ajouter un professeur{% endif %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">Prénom *</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                   value="{{ professor.first_name if professor else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Nom *</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                   value="{{ professor.last_name if professor else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ professor.email if professor else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Téléphone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ professor.phone if professor else '' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="subjects" class="form-label">Matières (séparées par virgule)</label>
+                            <textarea class="form-control" id="subjects" name="subjects" rows="3">{{ professor.subjects if professor else '' }}</textarea>
+                            <small class="form-text">Ex: Mathématiques, Français, Sciences</small>
+                        </div>
+
+                        {% if professor %}
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
+                                   {% if professor.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">
+                                Professeur actif
+                            </label>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                {% if professor %}✓ Modifier{% else %}✓ Ajouter{% endif %}
+                            </button>
+                            <a href="{{ url_for('professors.list_professors') }}" class="btn btn-secondary">
+                                Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

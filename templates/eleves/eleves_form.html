@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Ajouter un élève{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4">Ajouter un élève</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="card p-3 mb-4">
+            <h5>Informations de l'élève</h5>
+            <div class="mb-3">{{ form.first_name.label }} {{ form.first_name(class="form-control") }}</div>
+            <div class="mb-3">{{ form.last_name.label }} {{ form.last_name(class="form-control") }}</div>
+            <div class="mb-3">{{ form.birthdate.label }} {{ form.birthdate(class="form-control") }}</div>
+            <div class="mb-3">{{ form.class_id.label }} {{ form.class_id(class="form-select") }}</div>
+        </div>
+
+        <div class="card p-3 mb-4">
+            <h5>Informations du parent</h5>
+            <div class="mb-3">{{ form.parent_first_name.label }} {{ form.parent_first_name(class="form-control") }}</div>
+            <div class="mb-3">{{ form.parent_last_name.label }} {{ form.parent_last_name(class="form-control") }}</div>
+            <div class="mb-3">{{ form.parent_phone.label }} {{ form.parent_phone(class="form-control") }}</div>
+            <div class="form-check mb-3">
+                {{ form.parent_whatsapp(class="form-check-input") }}
+                {{ form.parent_whatsapp.label(class="form-check-label") }}
+            </div>
+        </div>
+
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+</div>
+{% endblock %}

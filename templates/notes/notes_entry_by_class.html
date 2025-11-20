@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Saisie des Notes par Classe{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary rounded-circle p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <span class="text-white" style="font-size: 32px;">📝</span>
+                </div>
+                <div>
+                    <h1 class="mb-0">Saisie des Notes par Classe</h1>
+                    <p class="text-muted mb-0">Enregistrez les notes quotidiennes pour une classe entière</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Formulaire de configuration -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="card border-primary shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">⚙️ Configuration de la Saisie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="configForm" class="row g-3">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Classe -->
+                        <div class="col-md-3">
+                            <label for="class_id" class="form-label"><strong>Classe</strong></label>
+                            {{ form.class_id(class="form-select form-select-lg", id="class_id", required=True) }}
+                            {% if form.class_id.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.class_id.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Matière -->
+                        <div class="col-md-3">
+                            <label for="subject" class="form-label"><strong>Matière</strong></label>
+                            {{ form.subject(class="form-select form-select-lg", id="subject", required=True) }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.subject.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Type d'évaluation -->
+                        <div class="col-md-3">
+                            <label for="assessment_type" class="form-label"><strong>Type</strong></label>
+                            {{ form.assessment_type(class="form-select form-select-lg", id="assessment_type", required=True) }}
+                            {% if form.assessment_type.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.assessment_type.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Date -->
+                        <div class="col-md-3">
+                            <label for="date" class="form-label"><strong>Date (jj/mm/aaaa)</strong></label>
+                            {{ form.date(class="form-control form-control-lg", id="date", type="date", required=True) }}
+                            {% if form.date.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.date.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Trimestre -->
+                        <div class="col-md-2">
+                            <label for="term" class="form-label"><strong>Trimestre</strong></label>
+                            {{ form.term(class="form-select form-select-lg", id="term", required=True) }}
+                            {% if form.term.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.term.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Note Maximale -->
+                        <div class="col-md-2">
+                            <label for="max_score" class="form-label"><strong>Note Max</strong></label>
+                            {{ form.max_score(class="form-control form-control-lg", id="max_score", placeholder="20.0", required=True) }}
+                            {% if form.max_score.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.max_score.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Boutons -->
+                        <div class="col-12">
+                            <button type="submit" name="action" value="load_students" class="btn btn-lg btn-primary">
+                                ✅ Charger la Classe
+                            </button>
+                            <a href="{{ url_for('notes.notes_dashboard') }}" class="btn btn-lg btn-secondary">
+                                ❌ Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-lg-4">
+            <div class="card border-info shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">💡 Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li>Sélectionnez une <strong>classe</strong></li>
+                        <li>Entrez la <strong>matière</strong> (ex: Français)</li>
+                        <li>Choisissez le <strong>type d'évaluation</strong>:
+                            <ul class="small mt-2">
+                                <li>❓ Interrogation</li>
+                                <li>📚 Devoir</li>
+                                <li>📋 Composition</li>
+                            </ul>
+                        </li>
+                        <li>Définissez la <strong>date</strong> et le <strong>trimestre</strong></li>
+                        <li>Cliquez <strong>"Charger la Classe"</strong></li>
+                        <li>Remplissez les notes pour chaque élève</li>
+                        <li>Cliquez <strong>"Enregistrer"</strong></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau de saisie des notes -->
+    {% if students_data %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card border-success shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📊 Saisie des Notes - {{ selected_subject }} ({{ selected_class.name }})</h5>
+                    <span class="badge bg-light text-dark">{{ students_data|length }} élève(s)</span>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="notesForm">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="action" value="save_notes">
+                        <input type="hidden" name="class_id" value="{{ selected_class.id if selected_class else '' }}">
+                        <input type="hidden" name="subject" value="{{ selected_subject or '' }}">
+                        <input type="hidden" name="assessment_type" value="{{ selected_assessment_type or '' }}">
+                        <input type="hidden" name="date" value="{{ selected_date or '' }}">
+                        <input type="hidden" name="term" value="{{ selected_term or '' }}">
+                        <input type="hidden" name="max_score" value="{{ selected_max_score or '' }}">
+
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 40%;">👤 Élève</th>
+                                        <th style="width: 20%;">📝 Note Obtenue</th>
+                                        <th style="width: 20%;">📊 Rendement /20</th>
+                                        <th style="width: 20%;">✓ Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students_data %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ student.full_name }}</strong>
+                                            <br>
+                                            <small class="text-muted">ID: {{ student.id }}</small>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                type="number" 
+                                                step="0.5" 
+                                                min="0" 
+                                                name="score_{{ student.id }}" 
+                                                class="form-control form-control-lg score-input" 
+                                                placeholder="0.0"
+                                                data-student-id="{{ student.id }}"
+                                                data-max-score="{{ selected_max_score or 20 }}"
+                                            >
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary score-badge-{{ student.id }}">-</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary status-badge-{{ student.id }}">Vide</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2 justify-content-end mt-4">
+                            <a href="{{ url_for('notes.notes_entry_by_class') }}" class="btn btn-lg btn-secondary">
+                                ⬅️ Retour à la Configuration
+                            </a>
+                            <button type="submit" class="btn btn-lg btn-success" onclick="return confirm('Êtes-vous sûr d\'enregistrer ces notes?');">
+                                ✅ Enregistrer les Notes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for dynamic score calculation -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scoreInputs = document.querySelectorAll('.score-input');
+    
+    scoreInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const studentId = this.dataset.studentId;
+            const maxScore = parseFloat(this.dataset.maxScore) || 20;
+            const score = parseFloat(this.value) || 0;
+            
+            // Calculer le rendement /20
+            const rendement = (score / maxScore) * 20;
+            const badgeElement = document.querySelector(`.score-badge-${studentId}`);
+            if (badgeElement) {
+                badgeElement.textContent = rendement.toFixed(2) + '/20';
+                badgeElement.className = `badge score-badge-${studentId}`;
+                if (rendement >= 16) badgeElement.classList.add('bg-success');
+                else if (rendement >= 12) badgeElement.classList.add('bg-info');
+                else if (rendement >= 8) badgeElement.classList.add('bg-warning');
+                else badgeElement.classList.add('bg-danger');
+            }
+            
+            // Mettre à jour le statut
+            const statusBadge = document.querySelector(`.status-badge-${studentId}`);
+            if (statusBadge) {
+                statusBadge.textContent = score > 0 ? '✓ Rempli' : 'Vide';
+                statusBadge.className = `badge status-badge-${studentId} ${score > 0 ? 'bg-success' : 'bg-secondary'}`;
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    .form-control-lg, .form-select-lg {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .table {
+        font-size: 1rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+    
+    .score-input {
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .badge {
+        font-size: 0.95rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .btn-lg {
+        font-size: 1.1rem;
+        padding: 0.75rem 1.5rem;
+    }
+</style>
+{% endblock %}
